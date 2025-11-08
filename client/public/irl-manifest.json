@@ -1,0 +1,10 @@
+{
+  "name": "Welcome to ZSpace",
+  "description": "An app for seeing who else is at at ZSpace.",
+  "location": "123 Main St, Vancouver, BC",
+  "icon": "./antler-icon.webp",
+  "type": "event",
+  "permissions": [
+    "profile"
+  ]
+}
