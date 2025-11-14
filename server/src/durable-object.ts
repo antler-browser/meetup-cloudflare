@@ -161,8 +161,6 @@ export class Broadcaster extends DurableObject<Env> {
         console.error(`Error sending to client:`, err)
       }
     })
-
-    this.lastActivity = Date.now()
   }
 
   /**
