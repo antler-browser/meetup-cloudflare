@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-An IRL Browser mini app for meetup check-ins with real-time attendee list. Uses `window.irlBrowser` API for profile access with JWT verification. This mini app is meant to run inside an IRL Browser like Antler. See `/docs/irl-browser-standard.md` for IRL Browser Standard specification.
+An IRL Browser mini app for meetup check-ins with real-time attendee list. Uses `window.irlBrowser` API for profile access with JWT verification. This mini app is meant to run inside an IRL Browser like Antler. See `/docs/irl-browser-specification.md` for IRL Browser Specification specification.
 
 **Project Structure**: This is a pnpm workspace monorepo with three packages:
 - `client/` - React frontend
@@ -43,7 +43,7 @@ An IRL Browser mini app for meetup check-ins with real-time attendee list. Uses 
 
 ### Root
 - `/docs/`: Documentation
-  - `irl-browser-standard.md` - IRL Browser Standard specification
+  - `irl-browser-specification.md` - IRL Browser Specification specification
 - `/scripts/`: Helper scripts
   - `update-metadata.js` - Updates irl-manifest.json and index.html from data.json
   - `ensure-client-dist.js` - Ensures client build exists (runs before dev via predev hook)

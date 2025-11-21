@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { decodeAndVerifyJWT } from '@meetup/shared'
+import { IrlOnboarding } from 'irl-browser-onboarding/react'
 import { QRCodePanel } from './components/QRCodePanel'
 import { UserList } from './components/UserList'
 import { UserDetail, type User } from './components/UserDetail'
@@ -14,7 +15,7 @@ declare global {
       getBrowserDetails(): {
         name: string;
         version: string;
-        platform: 'ios' | 'android';
+        platform: 'ios' | 'android' | 'browser';
         supportedPermissions: string[];
       };
       requestPermission(permission: string): Promise<boolean>;
@@ -23,29 +24,27 @@ declare global {
   }
 }
 
-// Helper function to detect iOS or Android
-const isMobileDevice = () => {
-  const userAgent = navigator.userAgent || (window as any).opera || '';
-  
-  // Check for iOS
-  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
-  
-  // Check for Android
-  const isAndroid = /android/i.test(userAgent);
-  
-  return isIOS || isAndroid;
-}
 
 export function App() {
   const [profile, setProfile] = useState<User | null>(null)
-  const [isIRLBrowser, setIsIRLBrowser] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null) // null = loading
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [users, setUsers] = useState<User[] | null>(null)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
+  // Handler for when onboarding completes - now window.irlBrowser is available
+  const handleOnboardingComplete = useCallback(() => {
+    setShowOnboardingModal(false)
+    setShowOnboarding(false)
+    loadProfile()
+    loadAvatar()
+  }, [])
+
   useEffect(() => {
-    // Check if running in an IRL Browser
-    setIsIRLBrowser(!!window.irlBrowser)
+    // Check if window.irlBrowser is available (native app or returning web user)
+    const hasIrlBrowser = !!window.irlBrowser
+    setShowOnboarding(!hasIrlBrowser)
 
     // Fetch all users from the database
     fetchUsers()
@@ -53,11 +52,11 @@ export function App() {
     // Connect to WebSocket for real-time updates
     const ws = connectToWebSocket()
 
-    // Get profile details immediately
-    loadProfile()
-
-    // Load avatar
-    loadAvatar()
+    // Only load profile if IRL Browser is available
+    if (hasIrlBrowser) {
+      loadProfile()
+      loadAvatar()
+    }
 
     // Cleanup on unmount
     return () => {
@@ -257,70 +256,13 @@ export function App() {
     }
   }
 
-  // Show loading state while waiting for users query to complete
+  // Show loading state while waiting for users
   if (!users) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
         <div className="grid md:grid-cols-2 min-h-screen">
           <QRCodePanel />
           <div className="flex items-center justify-center px-4"></div>
-        </div>
-      </div>
-    )
-  }
-
-   // Show fallback message user is scans with a regular browser (not an IRL Browser like Antler)
-   if (!isIRLBrowser && isMobileDevice()) {
-    return (
-      <div className="min-h-screen bg-white">
-        <div className="grid md:grid-cols-2 min-h-screen">
-          <QRCodePanel />
-          <div className="flex items-center justify-center px-4 py-12">
-            <div className="text-center max-w-2xl">
-              <div className="flex justify-center mb-8">
-                <div className="max-w-[150px] md:max-w-[200px]">
-                  <img
-                    src="https://ax0.taddy.org/antler/antler-icon.webp"
-                    alt="Antler"
-                    className="w-full h-auto rounded-3xl shadow-lg"
-                  />
-                </div>
-              </div>
-
-              {/* Hero Title */}
-              <h2 className="text-3xl md:text-4xl font-bold text-[#403B51] mb-8 leading-tight">
-                Scan with Antler!
-              </h2>
-
-              {/* Download Buttons */}
-              <div className="flex flex-wrap justify-center gap-4 mt-8">
-                <a
-                  href="https://apps.apple.com/app/id6753969350"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block transition-transform hover:-translate-y-1 active:scale-95"
-                >
-                  <img
-                    src="https://ax0.taddy.org/general/apple-app-store-badge.png"
-                    alt="Download on the App Store"
-                    className="h-12 md:h-14 w-auto"
-                  />
-                </a>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.antlerbrowser"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block transition-transform hover:-translate-y-1 active:scale-95"
-                >
-                  <img
-                    src="https://ax0.taddy.org/general/google-play-badge.png"
-                    alt="Download on Google Play"
-                    className="h-12 md:h-14 w-auto"
-                  />
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     )
@@ -361,7 +303,7 @@ export function App() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
       <div className="grid md:grid-cols-2 min-h-screen">
         <QRCodePanel />
-        <div className="flex px-4 py-8">
+        <div className="flex px-4 py-8 pb-24">
           <div className="w-full max-w-2xl mx-auto mt-10">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold mb-6 text-gray-800">
@@ -376,6 +318,35 @@ export function App() {
           </div>
         </div>
       </div>
+
+      {/* Floating "Add yourself" button for mobile users without IRL Browser */}
+      {showOnboarding && (
+        <button
+          onClick={() => setShowOnboardingModal(true)}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#403B51] text-white px-8 py-4 rounded-full shadow-lg hover:bg-[#322d40] transition-all hover:scale-105 font-semibold text-lg z-40 md:hidden"
+        >
+          Add yourself
+        </button>
+      )}
+
+      {/* Onboarding modal */}
+      {showOnboardingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowOnboardingModal(false)}
+          />
+          {/* Modal content */}
+          <div className="relative z-10 w-full max-w-lg mx-4 max-h-[90vh] overflow-auto rounded-2xl shadow-2xl">
+            <IrlOnboarding
+              mode="choice"
+              onComplete={handleOnboardingComplete}
+              customStyles={{ primaryColor: '#403B51' }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

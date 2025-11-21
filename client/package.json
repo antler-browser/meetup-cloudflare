@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@meetup/shared": "workspace:*",
+    "irl-browser-onboarding": "^1.1.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

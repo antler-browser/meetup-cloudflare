@@ -7,9 +7,9 @@ export const users = sqliteTable('users', {
   avatar: text('avatar'),
   socials: text('socials'), // JSON array of strings: ["platform:handle", "platform:handle"]
   createdAt : integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-})
-
-export const usersCreatedAtIndex = index('idx_users_created_at').on(users.createdAt)
+}, (table) => [
+  index('idx_users_created_at').on(table.createdAt),
+])
 
 // Type inference for TypeScript
 export type User = typeof users.$inferSelect

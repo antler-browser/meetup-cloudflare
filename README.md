@@ -2,6 +2,8 @@
 
 A mini app built with Antler IRL Browser that displays a real-time list of attendees as they scan a QR code. Perfect for meetups and events.
 
+**Note:** This repository is built to deploy to Cloudflare. For self-hosting, see [meetup-self-hosted](https://github.com/antler-browser/meetup-self-hosted). We recommend using Cloudflare because mini apps work really well with Cloudflare's free tier. 
+
 ## How It Works
 
 1. User scans QR code with Antler IRL Browser
@@ -10,8 +12,6 @@ A mini app built with Antler IRL Browser that displays a real-time list of atten
 4. Server verifies JWT, stores user in D1 database
 5. Durable Object broadcasts update via WebSocket to all connected clients
 6. Real-time attendee list updates automatically
-
-**Note:** This repository is built to deploy to Cloudflare. For self-hosting, see [meetup-self-hosted](https://github.com/antler-browser/meetup-self-hosted). We recommend using Cloudflare for this app as it will work with the free tier.
 
 ## Project Structure
 
