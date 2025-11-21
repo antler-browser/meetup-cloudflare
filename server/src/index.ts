@@ -192,15 +192,11 @@ app.get('/api/ws', async (c) => {
     headers: c.req.raw.headers,
   }))
 })
-
 /**
- * GET /health - Health check endpoint
+ * GET /api - Root api endpoint - Used for health check
  */
-app.get('/health', (c) => {
-  return c.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-  })
+app.get('/api', (c) => {
+  return c.text('😁')
 })
 
 // Export Durable Object

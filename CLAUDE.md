@@ -100,7 +100,7 @@ The server exposes the following REST and WebSocket endpoints:
 - `POST /api/add-avatar` - Add or update user avatar (requires JWT, accepts multipart/form-data)
 - `DELETE /api/remove-user` - Remove user from meetup (requires JWT in Authorization header)
 - `GET /api/users` - Get all users from the database (public, no auth required)
-- `GET /health` - Health check endpoint
+- `GET /api` - Root api endpoint - Used for health check
 
 **WebSocket Endpoint:**
 - `GET /api/ws` - Establish WebSocket connection for real-time updates

@@ -32,6 +32,8 @@ pnpm run dev              # Start development server
 
 Open `http://localhost:5173` in your browser. The IRL Browser Simulator will auto-login with a test profile.
 
+**Note**: `http://localhost:8787` is your backend. It is mapped to `http://localhost:5173/api` for convenience.
+
 ### Debugging with IRL Browser Simulator
 
 **Note:** The IRL Browser Simulator is a development-only tool. Never use in production.
