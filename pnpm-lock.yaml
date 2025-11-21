@@ -74,8 +74,8 @@ importers:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.6)
       irl-browser-simulator:
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: ^1.1.1
+        version: 1.1.1
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
@@ -1950,8 +1950,8 @@ packages:
       react:
         optional: true
 
-  irl-browser-simulator@1.1.0:
-    resolution: {integrity: sha512-Ehwh5gjJsLoOME01JNNzMdnPX+/hlU+K4cX6kJT0VzBUgOS+AbI05uwB4rQbO5hijBwiVSGqLfm8ynz73bMYDQ==}
+  irl-browser-simulator@1.1.1:
+    resolution: {integrity: sha512-vbewdeEU8GiZYl6bo5ShAP0aniY2T9gJvuGLNtFEbYAu0xb4shw9WIh5dwdrXa/RyQJ237k71tZedbmr+G37ug==}
     engines: {node: '>=20.0.0'}
 
   is-arrayish@0.3.4:
@@ -4403,7 +4403,7 @@ snapshots:
     optionalDependencies:
       react: 19.2.0
 
-  irl-browser-simulator@1.1.0:
+  irl-browser-simulator@1.1.1:
     dependencies:
       '@stablelib/ed25519': 1.0.3
       base58-universal: 2.0.0
