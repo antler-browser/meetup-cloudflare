@@ -86,6 +86,50 @@ pnpm db:studio            # Open Drizzle Studio for database inspection (from /s
 
 **Note**: For production, Alchemy reads the `migrationsDir` setting and applies any new migrations during deployment.
 
+### Running Admin Database Queries
+
+Use the Wrangler CLI to run SQL queries against D1 databases.
+
+**Development (Local D1):**
+```bash
+pnpm wrangler d1 execute meetup-cloudflare-dev-db --local --command "SELECT * FROM users;"
+```
+
+**Production (Remote D1):**
+
+Use the Cloudflare CLI to find the database name and run queries.
+```bash
+# Find the database name (format: meetup-irl-<stage>-db)
+pnpm wrangler d1 list
+
+# Run a query
+pnpm wrangler d1 execute meetup-irl-prod-db --remote --command "SELECT * FROM users;"
+```
+
+Or log in to the Cloudflare dashboard, go to the D1 database, and run SQL queries directly.
+
+### Admin Setup
+
+Admin status is stored in the D1 database (`is_admin` column in the `users` table). To make a user an admin, they must first check in to the meetup, then update their status using SQL.
+
+**Development (Local D1):**
+```bash
+# Set user as admin by DID
+pnpm wrangler d1 execute meetup-cloudflare-dev-db --local --command "UPDATE users SET is_admin = 1 WHERE did = 'did:key:z...';"
+```
+
+**Production (Remote D1):**
+```bash
+# Set user as admin by DID
+pnpm wrangler d1 execute meetup-irl-prod-db --remote --command "UPDATE users SET is_admin = 1 WHERE did = 'did:key:z...';"
+```
+
+Or log in to the Cloudflare dashboard, go to the D1 database, and run the SQL query.
+
+```sql
+UPDATE users SET is_admin = 1 WHERE did = 'did:key:z...';
+```
+
 ### Pre-Dev Hook
 The `pnpm run dev` command automatically runs a `predev` hook that executes `ensure-client-dist.js` to ensure the client build exists before starting the dev servers.
 
