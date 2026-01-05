@@ -4,6 +4,7 @@ import { IrlOnboarding } from 'irl-browser-onboarding/react'
 import { QRCodePanel } from './components/QRCodePanel'
 import { UserList } from './components/UserList'
 import { UserDetail, type User } from './components/UserDetail'
+import { AdminSection } from './components/AdminSection'
 import data from '../../data.json'
 
 // TypeScript declarations for IRL Browser API
@@ -32,6 +33,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null)
   const [users, setUsers] = useState<User[] | null>(null)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [eventEnded, setEventEnded] = useState<{ message: string } | null>(null)
 
   // Handler for when onboarding completes - now window.irlBrowser is available
   const handleOnboardingComplete = useCallback(() => {
@@ -73,8 +75,8 @@ export function App() {
       // Get profile details JWT
       const profileJwt = await window.irlBrowser.getProfileDetails()
 
-      // Add user to the database
-      addUserToDatabase(profileJwt)
+      // Add user to the database and get response with isAdmin
+      const dbUser = await addUserToDatabase(profileJwt)
 
       // Decode and verify the profile JWT
       const profilePayload = await decodeAndVerifyJWT(profileJwt)
@@ -84,7 +86,11 @@ export function App() {
         return;
       }
 
-      setProfile(profilePayload.data as User)
+      // Merge JWT data with isAdmin from database
+      setProfile({
+        ...profilePayload.data as User,
+        isAdmin: dbUser?.isAdmin ?? false
+      })
 
     } catch (err) {
       console.error('Error loading profile:', err)
@@ -137,7 +143,7 @@ export function App() {
     }
   }
 
-  const addUserToDatabase = async (profileJwt: string) => {
+  const addUserToDatabase = async (profileJwt: string): Promise<User | null> => {
     try {
       const response = await fetch('/api/add-user', {
         method: 'POST',
@@ -151,10 +157,11 @@ export function App() {
         throw new Error('Failed to check in')
       }
 
-      await response.json()
+      return await response.json() as User
     } catch (err) {
       console.error('Error adding user to database:', err)
       // Don't show error to user, they'll still see the user list
+      return null
     }
   }
 
@@ -229,7 +236,10 @@ export function App() {
 
             case 'meetup-ended':
               console.log('Meetup ended:', message.data)
-              // Optionally show a message to the user
+              const { message: endMessage } = message.data as { message: string }
+              setEventEnded({ message: endMessage })
+              setUsers([])
+              setProfile(null)
               break
 
             default:
@@ -286,6 +296,18 @@ export function App() {
     )
   }
 
+  // Show event ended screen
+  if (eventEnded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center max-w-md px-6">
+          <h1 className="text-3xl font-bold mb-4 text-gray-800">Meetup Ended</h1>
+          <p className="text-gray-600 text-lg">{eventEnded.message}</p>
+        </div>
+      </div>
+    )
+  }
+
   // Show user detail if a user is selected
   if (selectedUser) {
     return (
@@ -315,6 +337,16 @@ export function App() {
             <div className="mt-6">
               <UserList users={users} onUserClick={(user) => setSelectedUser(user)} />
             </div>
+
+            {/* Admin Section - Only shown for admins who are checked in */}
+            {profile?.isAdmin && (
+              <AdminSection
+                getProfileJwt={async () => await window.irlBrowser?.getProfileDetails()}
+                onEventEnded={() => {
+                  console.log('Event ended by admin')
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -140,6 +140,51 @@ app.delete('/api/remove-user', async (c) => {
 })
 
 /**
+ * POST /api/end-event - Admin only: End the meetup event
+ * Clears all users and broadcasts meetup-ended to all WebSocket clients
+ */
+app.post('/api/end-event', async (c) => {
+  try {
+    const body = await c.req.json()
+    const { profileJwt, message } = body as { profileJwt: string; message?: string }
+
+    if (!profileJwt) {
+      return c.json({ error: 'Missing profileJwt' }, 400)
+    }
+
+    // Verify JWT and extract DID
+    const payload = await decodeAndVerifyJWT(profileJwt)
+    const did = payload.iss
+
+    // Check if user is admin
+    const db = createDb(c.env.DB)
+    const isAdmin = await UserModel.isUserAdmin(db, did)
+
+    if (!isAdmin) {
+      return c.json({ error: 'Unauthorized: Admin access required' }, 403)
+    }
+
+    // Delete all users from database
+    await UserModel.deleteAllUsersExceptAdmins(db)
+
+    // Broadcast meetup-ended to all WebSocket clients
+    await notifyDO(c, 'meetup-ended', {
+      message: message || 'The meetup has ended. Thanks for joining!',
+      endedAt: new Date().toISOString(),
+      endedBy: did
+    })
+
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('End event error:', error)
+    return c.json(
+      { error: 'Failed to end event', message: (error as Error).message },
+      500
+    )
+  }
+})
+
+/**
  * GET /api/users - Get all users
  */
 app.get('/api/users', async (c) => {

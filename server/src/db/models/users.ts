@@ -2,7 +2,7 @@
  * User model - Database operations for meetup users
  */
 
-import { eq, desc, sql } from 'drizzle-orm'
+import { eq, desc, sql, ne } from 'drizzle-orm'
 import type { Database } from '../client.js'
 import { users, type User } from '../schema.js'
 
@@ -31,6 +31,14 @@ export async function getUserByDID(db: Database, did: string): Promise<User | un
     .limit(1)
 
   return user
+}
+
+/**
+ * Check if a user is an admin by DID
+ */
+export async function isUserAdmin(db: Database, did: string): Promise<boolean> {
+  const user = await getUserByDID(db, did)
+  return user?.isAdmin === true
 }
 
 /**
@@ -94,7 +102,7 @@ export async function addOrUpdateUserAvatar(db: Database, did: string, avatar: s
 /**
  * Clear all users (useful for testing or resetting)
  */
-export async function deleteAllUsers(db: Database): Promise<void> {
-  await db.delete(users)
-  console.log('✅ All users deleted')
+export async function deleteAllUsersExceptAdmins(db: Database): Promise<void> {
+  await db.delete(users).where(eq(users.isAdmin, false))
+  console.log('✅ All users deleted except admin')
 }

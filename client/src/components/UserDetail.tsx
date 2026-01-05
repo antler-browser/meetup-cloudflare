@@ -9,6 +9,7 @@ interface User {
   name: string
   avatar: string | null
   socials: string | null
+  isAdmin?: boolean
   createdAt: string
 }
 
