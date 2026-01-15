@@ -1,14 +1,14 @@
 # Meetup Mini App
 
-A mini app built with Antler IRL Browser that displays a real-time list of attendees as they scan a QR code. Perfect for meetups and events.
+A mini app built with Antler Local First Auth that displays a real-time list of attendees as they scan a QR code. Perfect for meetups and events.
 
 **Note:** This repository is built to deploy to Cloudflare. For self-hosting, see [meetup-self-hosted](https://github.com/antler-browser/meetup-self-hosted). We recommend using Cloudflare because it works on Cloudflare's free tier. 
 
 ## How It Works
 
-1. User scans QR code with Antler IRL Browser
-2. Client requests profile from `window.irlBrowser.getProfileDetails()` API
-3. IRL Browser generates and signs JWT with profile details
+1. User scans QR code with Antler Local First Auth
+2. Client requests profile from `window.localFirstAuth.getProfileDetails()` API
+3. Local First Auth generates and signs JWT with profile details
 4. Server verifies JWT, stores user in D1 database
 5. Durable Object broadcasts update via WebSocket to all connected clients
 6. Real-time attendee list updates automatically
@@ -30,20 +30,20 @@ pnpm run dev              # Start development server
 
 **Optional:** Edit `data.json` to customize your meetup details (title, description, etc.)
 
-Open `http://localhost:5173` in your browser. The IRL Browser Simulator will auto-login with a test profile.
+Open `http://localhost:5173` in your browser. The Local First Auth Simulator will auto-login with a test profile.
 
 **Note**: `http://localhost:8787` is your backend. It is mapped to `http://localhost:5173/api` for convenience.
 
-### Debugging with IRL Browser Simulator
+### Debugging with Local First Auth Simulator
 
-**Note:** The IRL Browser Simulator is a development-only tool. Never use in production.
+**Note:** The Local First Auth Simulator is a development-only tool. Never use in production.
 
-The simulator automatically injects the `window.irlBrowser` API in development mode:
+The simulator automatically injects the `window.localFirstAuth` API in development mode:
 
 ```typescript
 if (import.meta.env.DEV) {
-  const simulator = await import('irl-browser-simulator')
-  simulator.enableIrlBrowserSimulator()
+  const simulator = await import('local-first-auth-simulator')
+  simulator.enableLocalFirstAuthSimulator()
 }
 ```
 
@@ -51,7 +51,7 @@ if (import.meta.env.DEV) {
 - Auto-loads test profile (Paul Morphy)
 - Floating debug panel
 - Click "Open as X" to simulate multiple users in separate tabs
-- Load profiles via URL: `?irlProfile=<id>`
+- Load profiles via URL: `?test_profile=<id>`
 
 ## Deployment
 

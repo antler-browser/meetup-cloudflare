@@ -23,8 +23,8 @@ indexHtml = indexHtml.replace(
 writeFileSync(indexHtmlPath, indexHtml, 'utf-8');
 console.log('✅ Updated client/index.html');
 
-// Update client/public/irl-manifest.json
-const manifestPath = join(rootDir, 'client/public/irl-manifest.json');
+// Update client/public/local-first-auth-manifest.json
+const manifestPath = join(rootDir, 'client/public/local-first-auth-manifest.json');
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
 if (data.title) manifest.name = data.title;
 if (data.description) manifest.description = data.description;
@@ -33,6 +33,6 @@ if (data.type) manifest.type = data.type;
 if (data.icon) manifest.icon = data.icon;
 
 writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
-console.log('✅ Updated client/public/irl-manifest.json');
+console.log('✅ Updated client/public/local-first-auth-manifest.json');
 
 console.log('🎉 Metadata update complete!\n');

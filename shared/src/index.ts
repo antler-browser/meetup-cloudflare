@@ -1,4 +1,4 @@
-export { decodeAndVerifyJWT, type IRLJWTPayload } from './jwt.js'
+export { decodeAndVerifyJWT, type LocalFirstAuthJWTPayload } from './jwt.js'
 export {
   SocialPlatform,
   getPlatformDisplayName,
